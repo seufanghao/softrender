@@ -31,6 +31,10 @@ double stof(char* str)
 model::model(const char* filename)
 {
     primitive_count = 0;
+    if(!src_tex.read_tga_file("african_head_diffuse.tga"))
+    {
+        cout << "error read texture file!" << endl;
+    }
     ifstream in;
     in.open(filename);
     if(in.fail())
@@ -43,69 +47,74 @@ model::model(const char* filename)
     {
         getline(in, line);
         char str[256];
-        double v[3] = {0};
         // import vertex info to vert and vert_raw.
         if(line[0] == 'v' && line[1] == ' ')
         {
             int i = 2;
             int j = 0;
-            int cnt = 0;
-            while(1)
+            vector<int> vert;
+            vector<double> vert_raw;
+            for(int k = 0; k < 3; k++)
             {
-                if(line[i] != ' ' && line[i] != '\0')
-                {
-                    str[j] = line[i];
-                    j++;
-                }
-                else
-                {
-                    str[j] = '\0';
-                    v[cnt++] = stof(str);
-                    j = 0;
-                    if(line[i] == '\0')break;
-                }
+                while(line[i] != ' ' && line[i] != '\0')str[j++] = line[i++];
+                str[j] = '\0';
+                vert.push_back((int)((stof(str)+1.f)*500));
+                vert_raw.push_back(stof(str));
                 i++;
+                j = 0;
             }
-//            cout << v[0] << " " << v[1] << " " << v[2] << endl;
-            vector3d vec3((int)((v[0]+1.f)*500), (int)((v[1]+1.f)*500), (int)((v[2]+1.f)*500));
-            src_vert.push_back(vec3);
-            vector3f vec3f(v[0], v[1], v[2]);
-            src_vert_raw.push_back(vec3f);
+            src_vert.push_back(vector3d(vert[0], vert[1], vert[2]));
+            src_vert_raw.push_back(vector3f(vert_raw[0], vert_raw[1], vert_raw[2]));
         }
         // import vertex index to vert_idx and texture index to tex_idx
         if(line[0] == 'f' && line[1] == ' ')
         {
-            int i = 1;
+            int i = 2;
             int j = 0;
-            int cnt = 0;
-            bool start = 0;
-            while(1)
+            vector<int> vert_idx;
+            vector<int> tex_location_idx;
+            vector<int> unknown_idx;
+            for(int k = 0; k < 3; k++)
             {
-                if(line[i] == ' ')start = 1;
-                else if(start)
-                {
-                    if(line[i] == '/')
-                    {
-                        str[j] = '\0';
-                        v[cnt++] = stof(str);
-                        start = 0;
-                        j = 0;
-                    }
-                    else
-                    {
-                        str[j++] = line[i];
-                    }
-                }
-                if(line[i] == '\0')break;
+                while(line[i] != '/')str[j++] = line[i++];
+                str[j] = '\0';
+                vert_idx.push_back(stof(str));
                 i++;
+                j = 0;
+                while(line[i] != '/')str[j++] = line[i++];
+                str[j] = '\0';
+                tex_location_idx.push_back(stof(str));
+                i++;
+                j = 0;
+                while(line[i] != ' ' && line[i] != '\0')str[j++] = line[i++];
+                str[j] = '\0';
+                unknown_idx.push_back(stof(str));
+                i++;
+                j = 0;
             }
-//            cout << v[0] << " " << v[1] << " " << v[2] << endl;
-            vector<int> vec;
-            vec.push_back(v[0]);
-            vec.push_back(v[1]);
-            vec.push_back(v[2]);
-            src_vert_idx.push_back(vec);
+            //cout << tex_location_idx[0] << " " << tex_location_idx[1] << " " << tex_location_idx[2] << endl;
+            src_vert_idx.push_back(vert_idx);
+            src_tex_location_idx.push_back(tex_location_idx);
+            // TODO: push unknown_idx to vector accordingly
             primitive_count++;
+        }
+        if(line[0] == 'v' && line[1] == 't')// check results
+        {
+            int i = 2;
+            int j = 0;
+            vector<int> tex_location;
+            vector<double> tex_location_raw;
+            for(int k = 0; k < 2; k++)
+            {
+                while(line[i] != ' ')str[j++] = line[i++];
+                str[j] = '\0';
+                tex_location.push_back((int)(stof(str)*1000));
+                tex_location_raw.push_back(stof(str));
+                i++;
+                j = 0;
+            }
+            src_tex_location.push_back(vector2d(tex_location[0], tex_location[1]));
+            src_tex_location_raw.push_back(vector2f(tex_location_raw[0], tex_location_raw[1]));
         }
         else continue;
     }
@@ -135,35 +144,32 @@ vector<vector3f> model::vertex_raw(int idx)
     vertex_raw.push_back(src_vert_raw[C_index-1]);
     return vertex_raw;
 }
-/*vector2d model::texelLocation(int tex_idx)
+
+vector<vector2f> model::texture_location_raw(int idx)
 {
-    return tex[tex_location_idx-1];
-}
-vector3f model::texelLocation_raw(int tex_idx)
-{
-    return tex_location_raw[tex_location_idx-1];
-}*/
-vector<TGAColor> model::texture(int idx)
-{
-    vector<TGAColor> texture;
+    vector<vector2f> texture_location_raw;
     vector<int> texture_location_index = src_tex_location_idx[idx];
     int A_location_index = texture_location_index[0];
     int B_location_index = texture_location_index[1];
     int C_location_index = texture_location_index[2];
-    vector2d A_location = src_tex_location[A_location_index];
+    cout <<"Index: " << A_location_index << " " << B_location_index << " " << C_location_index << endl;
+    texture_location_raw.push_back(src_tex_location_raw[A_location_index]);
+    texture_location_raw.push_back(src_tex_location_raw[B_location_index]);
+    texture_location_raw.push_back(src_tex_location_raw[C_location_index]);
+    cout << "Location_raw:=0 " << src_tex_location_raw[A_location_index].x << " " << src_tex_location_raw[B_location_index].x
+    << " " << src_tex_location_raw[C_location_index].x << endl;
+    cout << "Location:=0 " << src_tex_location[A_location_index].x << " " << src_tex_location[B_location_index].x
+    << " " << src_tex_location[C_location_index].x << endl;
+
+/*    vector2d A_location = src_tex_location[A_location_index];
     vector2d B_location = src_tex_location[B_location_index];
     vector2d C_location = src_tex_location[C_location_index];
     texture.push_back(src_tex.get(A_location.x, A_location.y));
     texture.push_back(src_tex.get(B_location.x, B_location.y));
-    texture.push_back(src_tex.get(C_location.x, C_location.y));
-    return texture;
+    texture.push_back(src_tex.get(C_location.x, C_location.y));*/
+    return texture_location_raw;
 }
-/*
-vector<int> model::verticeIndex(int idx)
+TGAColor model::texel(int x, int y)
 {
-    return vert_idx[idx];
+    return src_tex.get(x, y);
 }
-vector<int> model::texelLocationIndex(int idx)
-{
-    return tex_location_idx[idx];
-}*/

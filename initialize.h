@@ -14,7 +14,9 @@ public:
     vector<vector3f> vertex_raw(int idx);
     vector<vector3d> vertex(int idx);
 
-    vector<TGAColor> texture(int idx);
+    vector<vector2d> texture_location(int idx);
+    vector<vector2f> texture_location_raw(int idx);
+    TGAColor texel(int x, int y);
     int primitive_count;
 private:
     vector<vector<int>> src_vert_idx;

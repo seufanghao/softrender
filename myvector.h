@@ -28,6 +28,7 @@ public:
 
     vector2f operator+(const vector2f &vec2);
     vector2f operator-(const vector2f &vec2);
+    vector2f operator=(const vector2f &vec2);
 
     double x;
     double y;

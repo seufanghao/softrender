@@ -1,0 +1,53 @@
+# depslib dependency file v1.0
+1523707988 source:c:\users\haofan01\desktop\softrender\culling_clipping.cpp
+	<iostream>
+	"culling_clipping.h"
+	<cmath>
+
+1523707085 c:\users\haofan01\desktop\softrender\culling_clipping.h
+	"myvector.h"
+
+1523805009 c:\users\haofan01\desktop\softrender\myvector.h
+
+1523807948 source:c:\users\haofan01\desktop\softrender\initialize.cpp
+	"initialize.h"
+	<fstream>
+	<iostream>
+
+1523807857 c:\users\haofan01\desktop\softrender\initialize.h
+	<vector>
+	"myvector.h"
+	"tgaimage.h"
+
+1421515814 c:\users\haofan01\desktop\softrender\tgaimage.h
+	<fstream>
+
+1523807414 source:c:\users\haofan01\desktop\softrender\main.cpp
+	<iostream>
+	"tgaimage.h"
+	"myvector.h"
+	"initialize.h"
+	"rasterizer.h"
+
+1523805467 c:\users\haofan01\desktop\softrender\rasterizer.h
+	"myvector.h"
+	"tgaimage.h"
+	"culling_clipping.h"
+	"initialize.h"
+
+1523805104 source:c:\users\haofan01\desktop\softrender\myvector.cpp
+	"myvector.h"
+	<iostream>
+
+1523808637 source:c:\users\haofan01\desktop\softrender\rasterizer.cpp
+	"rasterizer.h"
+	<iostream>
+
+1421515814 source:c:\users\haofan01\desktop\softrender\tgaimage.cpp
+	<iostream>
+	<fstream>
+	<string.h>
+	<time.h>
+	<math.h>
+	"tgaimage.h"
+

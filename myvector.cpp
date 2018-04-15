@@ -33,7 +33,38 @@ vector2d vector2d::operator=(const vector2d &vec2)
     this->y = vec2.y;
     return *this;
 }
-
+vector2f::vector2f():x(0),y(0)
+{
+}
+vector2f::vector2f(double a, double b)
+{
+    x = a;
+    y = b;
+}
+vector2f::vector2f(const vector2f &vec2)
+{
+    x = vec2.x;
+    y = vec2.y;
+}
+vector2f vector2f::operator+(const vector2f &vec2)
+{
+    this->x = x + vec2.x;
+    this->y = y + vec2.y;
+    return *this;
+}
+vector2f vector2f::operator-(const vector2f &vec2)
+{
+    this->x = x - vec2.x;
+    this->y = y - vec2.y;
+    return *this;
+}
+vector2f vector2f::operator=(const vector2f &vec2)
+{
+    this->x = vec2.x;
+    this->y = vec2.y;
+    return *this;
+}
+//*************************************************************************//
 vector3f::vector3f(double a, double b, double c)
 {
     x = a;

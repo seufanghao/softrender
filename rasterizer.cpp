@@ -66,7 +66,7 @@ void scanLine(vector2d v1, vector2d v2, vector2d v3, TGAImage &image, TGAColor c
         }
     }
 }
-void baryCentric(vector3d v1, vector3d v2, vector3d v3, TGAImage &image, TGAColor color, double intensity, int* zbuffer)
+void baryCentric(vector3d v1, vector3d v2, vector3d v3, TGAImage &image, TGAColor color, double intensity, int* zbuffer, model m, int cnt)
 {
     int min_x = min(min(v1.x, v2.x), v3.x);
     int max_x = max(max(v1.x, v2.x), v3.x);
@@ -87,11 +87,15 @@ void baryCentric(vector3d v1, vector3d v2, vector3d v3, TGAImage &image, TGAColo
             if(u >= 0 && u <= 1 && v >= 0 && v <= 1 && w >= 0 && w <= 1)
             {
                 vp.z = u*v1.z + v*v2.z + w*v3.z;
-                if(vp.z < 0)cout << vp.z << endl;
                 if(vp.z > zbuffer[vp.x*1000+vp.y])
                 {
                     zbuffer[vp.x*1000+vp.y] = vp.z;
-                    image.set(vp.x, vp.y, TGAColor(intensity*255, intensity*255, intensity*255, 255));
+                    //image.set(vp.x, vp.y, TGAColor(intensity*255, intensity*255, intensity*255, 255));
+                    vector<vector2f> locations = m.texture_location_raw(cnt);
+                    vector2d location((int)(1000*(locations[0].x+locations[1].x+locations[2].x)), (int)(1000*(locations[0].x+locations[1].x+locations[2].x)));
+                    //cout << cnt << " " << locations[0].x << " " << locations[1].x << " " << locations[2].x << endl;
+                    TGAColor c = m.texel(location.x, location.y);
+                    image.set(vp.x, vp.y, c);
                 }
             }
         }
