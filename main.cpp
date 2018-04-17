@@ -24,16 +24,19 @@ int main()
     {
         // back-face culling
         vector<vector3f> triangle_raw = m1.vertex_raw(i);
-        double intensity = backfaceCulling(triangle_raw[0], triangle_raw[1], triangle_raw[2], lightdir);
+        float intensity = backfaceCulling(triangle_raw[0], triangle_raw[1], triangle_raw[2], lightdir);
         if(intensity < 0)continue;
 
         vector<vector3d> triangle = m1.vertex(i);
 
         // rasterization and set depth buffer
-        baryCentric(triangle[0], triangle[1], triangle[2], image, red, intensity, zbuffer, m1, i);
-//        bresenham(v4, v5, image, red);
-//        bresenham(v4, v6, image, red);
-//        bresenham(v5, v6, image, red);
+/*        if((triangle[0].x > 400 && triangle[0].x < 600)
+           || (triangle[1].x > 400 && triangle[1].x < 600)
+           || (triangle[2].x > 400 && triangle[2].x < 600))*/
+        baryCentric(triangle[0], triangle[2], triangle[1], image, red, intensity, zbuffer, m1, i);
+        //bresenham(vector2d(triangle[0].x, triangle[0].y), vector2d(triangle[0].x, triangle[0].y), image, red);
+        //bresenham(vector2d(triangle[1].x, triangle[1].y), vector2d(triangle[1].x, triangle[1].y), image, red);
+        //bresenham(vector2d(triangle[2].x, triangle[2].y), vector2d(triangle[2].x, triangle[2].y), image, red);
 //        scanLine(v4, v5, v6, image, white);
     }
 

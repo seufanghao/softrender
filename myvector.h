@@ -23,15 +23,15 @@ class vector2f
 {
 public:
     vector2f();
-    vector2f(double a, double b);
+    vector2f(float a, float b);
     vector2f(const vector2f &vec2);
 
     vector2f operator+(const vector2f &vec2);
     vector2f operator-(const vector2f &vec2);
     vector2f operator=(const vector2f &vec2);
 
-    double x;
-    double y;
+    float x;
+    float y;
 
 private:
 
@@ -42,15 +42,17 @@ private:
 class vector3f
 {
 public:
-    vector3f(double a, double b, double c);
+    vector3f(float a, float b, float c);
 
     vector3f(const vector3f &vec3);
 
     vector3f operator-(const vector3f &vec3);
+    vector3f operator+(const vector3f &vec3);
+    vector3f operator*(float a);
 
-    double x;
-    double y;
-    double z;
+    float x;
+    float y;
+    float z;
 };
 class vector3d
 {
@@ -66,6 +68,6 @@ public:
 };
 vector3d cross(vector3d v1, vector3d v2);
 vector3f cross(vector3f v1, vector3f v2);
-double dot(vector3f v1, vector3f v2);
+float dot(vector3f v1, vector3f v2);
 
 #endif // MYVECTOR_H

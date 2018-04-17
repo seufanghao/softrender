@@ -3,11 +3,11 @@
 #include <iostream>
 using namespace std;
 
-double stof(char* str)
+float stof(char* str)
 {
     if(str == NULL)return 0;
-    double high = 0;
-    double low = 0;
+    float high = 0;
+    float low = 0;
     char *p = str;
     bool negative = 0;
     if(*p == '-'){ negative = 1; p++; }
@@ -17,7 +17,7 @@ double stof(char* str)
         high = high * 10 + (*p - '0');
         p++;
     }
-    double base = 10;
+    float base = 10;
     while(*p != '\0')
     {
         low = low + (*p - '0')/base;
@@ -35,6 +35,14 @@ model::model(const char* filename)
     {
         cout << "error read texture file!" << endl;
     }
+    src_tex.flip_vertically();
+    //src_tex.flip_horizontally();
+    /*for(int i = 0; i < 100; i++)
+        for(int j = 0; j < 100; j++)
+    {
+        src_tex.set(i, j, TGAColor(255, 255, 255, 255));
+    }
+    src_tex.write_tga_file("texture.tga");*/
     ifstream in;
     in.open(filename);
     if(in.fail())
@@ -53,7 +61,7 @@ model::model(const char* filename)
             int i = 2;
             int j = 0;
             vector<int> vert;
-            vector<double> vert_raw;
+            vector<float> vert_raw;
             for(int k = 0; k < 3; k++)
             {
                 while(line[i] != ' ' && line[i] != '\0')str[j++] = line[i++];
@@ -66,14 +74,51 @@ model::model(const char* filename)
             src_vert.push_back(vector3d(vert[0], vert[1], vert[2]));
             src_vert_raw.push_back(vector3f(vert_raw[0], vert_raw[1], vert_raw[2]));
         }
+        else if(line[0] == 'v' && line[1] == 't')// check results
+        {
+            int i = 4;
+            int j = 0;
+            vector<int> tex_location;
+            vector<float> tex_location_raw;
+            for(int k = 0; k < 2; k++)
+            {
+                char str[256];
+                while(line[i] != ' ')str[j++] = line[i++];
+                str[j] = '\0';
+                //cout << "read tex location data: " << stof(str) << " ";
+                //if(k == 1)cout << endl;
+                tex_location.push_back((int)(stof(str)*1000));
+                tex_location_raw.push_back(stof(str));
+                i++;
+                j = 0;
+            }
+            src_tex_location.push_back(vector2d(tex_location[0], tex_location[1]));
+            src_tex_location_raw.push_back(vector2f(tex_location_raw[0], tex_location_raw[1]));
+        }
+        else if(line[0] == 'v' && line[1] == 'n')
+        {
+            int i = 4;
+            int j = 0;
+            vector<float> vert_normal_raw;
+            for(int k = 0; k < 3; k++)
+            {
+                char str[256];
+                while(line[i] != ' ' && line[i] != '\0')str[j++] = line[i++];
+                str[j] = '\0';
+                vert_normal_raw.push_back(stof(str));
+                i++;
+                j = 0;
+            }
+            src_vert_normal_raw.push_back(vector3f(vert_normal_raw[0], vert_normal_raw[1], vert_normal_raw[2]));
+        }
         // import vertex index to vert_idx and texture index to tex_idx
-        if(line[0] == 'f' && line[1] == ' ')
+        else if(line[0] == 'f' && line[1] == ' ')
         {
             int i = 2;
             int j = 0;
             vector<int> vert_idx;
             vector<int> tex_location_idx;
-            vector<int> unknown_idx;
+            vector<int> vert_normal_idx;
             for(int k = 0; k < 3; k++)
             {
                 while(line[i] != '/')str[j++] = line[i++];
@@ -88,33 +133,15 @@ model::model(const char* filename)
                 j = 0;
                 while(line[i] != ' ' && line[i] != '\0')str[j++] = line[i++];
                 str[j] = '\0';
-                unknown_idx.push_back(stof(str));
+                vert_normal_idx.push_back(stof(str));
                 i++;
                 j = 0;
             }
             //cout << tex_location_idx[0] << " " << tex_location_idx[1] << " " << tex_location_idx[2] << endl;
             src_vert_idx.push_back(vert_idx);
             src_tex_location_idx.push_back(tex_location_idx);
-            // TODO: push unknown_idx to vector accordingly
+            src_vert_normal_idx.push_back(vert_normal_idx);
             primitive_count++;
-        }
-        if(line[0] == 'v' && line[1] == 't')// check results
-        {
-            int i = 2;
-            int j = 0;
-            vector<int> tex_location;
-            vector<double> tex_location_raw;
-            for(int k = 0; k < 2; k++)
-            {
-                while(line[i] != ' ')str[j++] = line[i++];
-                str[j] = '\0';
-                tex_location.push_back((int)(stof(str)*1000));
-                tex_location_raw.push_back(stof(str));
-                i++;
-                j = 0;
-            }
-            src_tex_location.push_back(vector2d(tex_location[0], tex_location[1]));
-            src_tex_location_raw.push_back(vector2f(tex_location_raw[0], tex_location_raw[1]));
         }
         else continue;
     }
@@ -152,14 +179,14 @@ vector<vector2f> model::texture_location_raw(int idx)
     int A_location_index = texture_location_index[0];
     int B_location_index = texture_location_index[1];
     int C_location_index = texture_location_index[2];
-    cout <<"Index: " << A_location_index << " " << B_location_index << " " << C_location_index << endl;
-    texture_location_raw.push_back(src_tex_location_raw[A_location_index]);
-    texture_location_raw.push_back(src_tex_location_raw[B_location_index]);
-    texture_location_raw.push_back(src_tex_location_raw[C_location_index]);
-    cout << "Location_raw:=0 " << src_tex_location_raw[A_location_index].x << " " << src_tex_location_raw[B_location_index].x
-    << " " << src_tex_location_raw[C_location_index].x << endl;
-    cout << "Location:=0 " << src_tex_location[A_location_index].x << " " << src_tex_location[B_location_index].x
-    << " " << src_tex_location[C_location_index].x << endl;
+    //cout <<"Index: " << A_location_index << " " << B_location_index << " " << C_location_index << endl;
+    texture_location_raw.push_back(src_tex_location_raw[A_location_index-1]);
+    texture_location_raw.push_back(src_tex_location_raw[B_location_index-1]);
+    texture_location_raw.push_back(src_tex_location_raw[C_location_index-1]);
+    //cout << "Location_raw:=0 " << src_tex_location_raw[A_location_index].x << " " << src_tex_location_raw[B_location_index].x
+    //<< " " << src_tex_location_raw[C_location_index].x << endl;
+    //cout << "Location:=0 " << src_tex_location[A_location_index].x << " " << src_tex_location[B_location_index].x
+    //<< " " << src_tex_location[C_location_index].x << endl;
 
 /*    vector2d A_location = src_tex_location[A_location_index];
     vector2d B_location = src_tex_location[B_location_index];
@@ -172,4 +199,14 @@ vector<vector2f> model::texture_location_raw(int idx)
 TGAColor model::texel(int x, int y)
 {
     return src_tex.get(x, y);
+}
+
+vector<vector3f> model::vertex_normal_raw(int idx)
+{
+    vector<vector3f> vertex_normal_raw;
+    vector<int> vertice_normal_index = src_vert_normal_idx[idx];
+    vertex_normal_raw.push_back(src_vert_normal_raw[vertice_normal_index[0]-1]);
+    vertex_normal_raw.push_back(src_vert_normal_raw[vertice_normal_index[1]-1]);
+    vertex_normal_raw.push_back(src_vert_normal_raw[vertice_normal_index[2]-1]);
+    return vertex_normal_raw;
 }

@@ -36,7 +36,7 @@ vector2d vector2d::operator=(const vector2d &vec2)
 vector2f::vector2f():x(0),y(0)
 {
 }
-vector2f::vector2f(double a, double b)
+vector2f::vector2f(float a, float b)
 {
     x = a;
     y = b;
@@ -65,7 +65,7 @@ vector2f vector2f::operator=(const vector2f &vec2)
     return *this;
 }
 //*************************************************************************//
-vector3f::vector3f(double a, double b, double c)
+vector3f::vector3f(float a, float b, float c)
 {
     x = a;
     y = b;
@@ -82,6 +82,20 @@ vector3f vector3f::operator-(const vector3f &vec3)
     x = x - vec3.x;
     y = y - vec3.y;
     z = z - vec3.z;
+    return *this;
+}
+vector3f vector3f::operator+(const vector3f &vec3)
+{
+    x = x + vec3.x;
+    y = y + vec3.y;
+    z = z + vec3.z;
+    return *this;
+}
+vector3f vector3f::operator*(float a)
+{
+    x = x * a;
+    y = y * a;
+    z = z * a;
     return *this;
 }
 vector3d::vector3d(int a, int b, int c)
@@ -111,7 +125,7 @@ vector3f cross(vector3f v1, vector3f v2)
 {
     return vector3f(v1.y*v2.z-v2.y*v1.z, v1.z*v2.x-v2.z*v1.x, v1.x*v2.y-v2.x*v1.y);
 }
-double dot(vector3f v1, vector3f v2)
+float dot(vector3f v1, vector3f v2)
 {
     return (v1.x*v2.x + v1.y*v2.y + v1.z*v2.z);
 }
